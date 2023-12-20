@@ -9,7 +9,7 @@ sys.path.append(project_root)
 from database.connection import create_connection
 from database.operations import print_all_inventory_items, print_all_bookings
 
-def view_inventory():
+def print_all():
     # Define your database path
     database_path = "path_to_your_database.db"
 
@@ -25,4 +25,4 @@ def view_inventory():
         print("Error! Cannot create the database connection.")
 
 if __name__ == "__main__":
-    view_inventory()
+    print_all()

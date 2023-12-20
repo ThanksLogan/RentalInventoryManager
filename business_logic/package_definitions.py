@@ -1,6 +1,6 @@
 packages = {
 # V2 packages
-    "v2_98": {"v2_ottoman": 4, "v2_square": 4, "LED": 1},
+    "v2_98": {"v2_ottoman": 4, "v2_square": 4, "LED": 1}, 
     "v2_99": {"v2_ottoman": 2, "v2_corner": 1, "v2_armless": 2, "v2_square": 2, "LED": 2},
     "v2_100": {"v2_ottoman": 4, "v2_corner": 2, "v2_armless": 4, "v2_square": 4, "LED": 4},
     "v2_101": {"v2_ottoman": 8, "v2_corner": 4, "v2_armless": 8, "v2_square": 8, "LED": 8},

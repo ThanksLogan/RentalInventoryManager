@@ -1,7 +1,11 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QListWidgetItem
+from PyQt5.QtWidgets import QListWidget
+
 from .add_event_dialog import AddEventDialog
 from business_logic import package_definitions
+from database.operations import create_booking
+from scripts import view_db
 import os
 
 class MainWindow(QMainWindow):
@@ -10,7 +14,12 @@ class MainWindow(QMainWindow):
         ui_path = os.path.join(os.path.dirname(__file__), 'LujoIMS_UI_v1.1.ui')
         uic.loadUi(ui_path, self)
 
+        '''Initializations'''
+        self.selected_item_name = None  # Initialize selected_item_name
+
         self.init_ui()
+        #self.currently_selected_item = None  # Attribute to store the selected item
+
 
     def init_ui(self):
         # Connect the calendar widgets to update methods
@@ -26,6 +35,26 @@ class MainWindow(QMainWindow):
         self.to_date = None
 
         self.populate_list_widget()
+
+        # Connect the itemClicked signal of each QListWidget in the tabs
+        self.v2ListWidget.itemClicked.connect(self.on_item_selected)
+        self.legacyListWidget.itemClicked.connect(self.on_item_selected)
+        self.ultraListWidget.itemClicked.connect(self.on_item_selected)
+        # Repeat for other QListWidgets in other tabs
+
+        # Connect the Add button
+        self.addPushButton.clicked.connect(self.on_add_item_clicked)
+        # Connect the Done button 
+        self.doneButton.clicked.connect(self.on_done_clicked)
+
+        # makes it run left to right on currently selected items
+        self.currentlySelectedListWidget.setViewMode(QListWidget.IconMode)
+        self.currentlySelectedListWidget.setFlow(QListWidget.LeftToRight)
+        self.currentlySelectedListWidget.setWrapping(False)
+        self.currentlySelectedListWidget.setResizeMode(QListWidget.Adjust)
+
+        
+
 
     def update_from_date_time(self):
         selected_date = self.fromDateCalendar.selectedDate()
@@ -72,20 +101,25 @@ class MainWindow(QMainWindow):
 
     def on_item_clicked(self, item):
         print("Clicked item:", item.text())
+        self.currently_selected_item = item
 
     def on_item_selected(self):
-        selected_item = self.get_selected_item()  # Implement this method
-        selected_dates = self.get_selected_dates()  # Implement this method
-        availability = self.check_availability(selected_item, selected_dates)
-        self.display_availability(availability)
+        # Get the selected item from the active QListWidget
+        current_list_widget = self.get_active_list_widget()
+        selected_item = current_list_widget.currentItem()
+        if selected_item:
+            self.selected_item_name = selected_item.text()
+        else:
+            self.selected_item_name = None
 
-    def get_selected_item(self):
+    '''def get_selected_items(self):
         # Logic to get the selected item's identifier from the list widget
         pass
 
     def get_selected_dates(self):
         # Logic to get the selected 'from' and 'to' dates from the calendar
-        pass
+        # Tuple?
+        return (self.from_date, self.to_date)
 
     def check_availability(self, item, dates):
         # Logic to check the database for the item's availability
@@ -95,7 +129,114 @@ class MainWindow(QMainWindow):
     def display_availability(self, availability):
         # Logic to display the availability status to the user
         pass
-    
+    '''
+
+    def on_add_item_clicked(self):
+        # Check if an item has been selected
+        if self.selected_item_name is not None:
+            quantity = self.spinBox.value()
+            item_with_quantity = f"{self.selected_item_name} - Quantity: {quantity}"
+
+            # Add the selected item's text to the secondListWidget
+            self.currentlySelectedListWidget.addItem(item_with_quantity)
+
+            # Optionally, clear the currently selected item
+            self.selected_item_name = None
+        else:
+            print("No item selected")  # Or show a message to the user
+
+    def get_active_list_widget(self):
+        # Assuming you have a QTabWidget named tabWidget
+        current_tab_index = self.tabWidget.currentIndex()
+        # Return the QListWidget corresponding to the current tab
+        if current_tab_index == 0:
+            return self.v2ListWidget
+        elif current_tab_index == 1:
+            return self.legacyListWidget
+        # Add more conditions for other tabs
+        # ...
+        else:
+            return None
+
+    def on_done_clicked(self):
+        items_to_process = []
+        for i in range(self.currentlySelectedListWidget.count()):
+            item_text = self.currentlySelectedListWidget.item(i).text()
+            item_name, item_quantity = self.parse_item_and_quantity(item_text)
+            item_id = self.get_item_id(item_name)
+            items_to_process.append((item_id, item_quantity))
+        # Gather item IDs from the second list
+        #items_to_book = [self.get_item_id(item.text()) for item in self.get_all_items(self.currentlySelectedListWidget)]
+        # items to book list will look like: [("10125473", 4), ("V299", 1)] <- list of tuples
+        # Call database function to create booking
+        self.create_booking(items_to_process)
+        
+    def parse_item_and_quantity(self, item_text):
+        # Example item_text: "ItemName - Quantity: 4"
+        name_part, quantity_part = item_text.split(" - Quantity: ")
+        quantity = int(quantity_part)
+        return name_part, quantity
+
+    def get_all_items(self, list_widget):
+        # Retrieve all items from a QListWidget
+        return [list_widget.item(i) for i in range(list_widget.count())]
+
+    def get_item_id(self, item_name):
+        # Implement logic to retrieve item ID based on item name
+        
+        match item_name: # TODO: id for LED: 56556348
+            case "V2 Lounge 99":
+                return "V2_99"
+            case "V2 Lounge 100":
+                return "V2_100"
+            case "V2 Lounge 101":
+                return "V2_101"
+            case "V2 Lounge 98":
+                return "V2_98"
+            case "Legacy Backed Ottoman":
+                return "10125473"
+            case "Legacy Big Ottoman":
+                return "92857097"
+            case "Legacy Corner Chair":
+                return "63321077"
+            case "Legacy Square":
+                return "90442326"
+            case "Legacy Armless Chair":
+                return "42212173"
+            case "Legacy Ottoman":
+                return "18612390"
+            case "Legacy Rectangle":
+                return "16177294"
+            case "V2 Ottoman":
+                return "12775351"
+            case "V2 Corner Chair":
+                return "25942155"
+            case "V2 Armless Chair":
+                return "29591065"
+            case "V2 Square":
+                return "55453976"
+            case _:
+                return 0      
+
+    #param: items_to_book: tuple (item(id), quantity)
+    def create_booking(self, items_to_book):
+        conn = self.get_database_connection()
+        # Implement or call a function to handle booking logic
+        from_date_string = self.from_date.toString("yyyy-MM-dd")
+        to_date_string = self.to_date.toString("yyyy-MM-dd")
+        print(from_date_string, to_date_string)
+        create_booking(conn, items_to_book, from_date_string, to_date_string)
+
+
+    def get_database_connection(self):
+        # Implement the logic to create and return a database connection
+        from database.connection import create_connection
+        return create_connection("path_to_your_database.db")
 
 
 # The rest of your class remains unchanged
+# DELIVERY FEES <- edit, add additional fees for: mileage, big orders
+    ''' additions to make:
+    --mileage: api calls to google maps 
+    --time for mileage: worker cost, mpg of truck
+    '''

@@ -1,4 +1,5 @@
 from sqlite3 import Error
+import random
 
 
 def create_inventory_item(conn, item):
@@ -43,38 +44,54 @@ def print_all_inventory_items(conn):
         print(e)
 
 
-def create_booking(conn, item):
+def create_booking(conn, items, from_date, to_date):
     """
-    Create a new item in the inventory table.
+    Create a new item in the booking table.
     :param conn: Connection object
-    :param item: Tuple containing item details (name, quantity, price)
+    :param items: List of Tuples containing booking details [(name, quantity)]
     """
-    # Example: Adding a booking with two different items
-    #booking_id = generate_new_booking_id()  # Implement this function
-    booking_items = [
-    {"item_id": 1, "quantity": 2},
-    {"item_id": 3, "quantity": 1}
-    ]
-    '''
-    for item in booking_items:
-        cursor.execute(
-            "INSERT INTO bookings (booking_id, item_id, quantity_booked, from_date, to_date) VALUES (?, ?, ?, ?, ?)",
-            ("1234", item['item_id'], item['quantity'], '2023-12-18', '2023-12-19')
-        )      
-    '''
+    # Now, we have to unpack the packages to get an individual item from them.
+    # basically if it recognizes a package, it should push the items and their quantities to the back of the list of tuples.
 
-    sql = '''INSERT INTO bookings(booking_id, item_id, quantity_booked, from_date, to_date)
-             VALUES (?, ?, ?, ?, ?)
-             '''
     
-    try:
+    # for each time a create_booking is called, a unique booking number is assigned to it
+    booking_id = generate_unique_8_digit_number()
+    try: 
         cursor = conn.cursor()
-        cursor.execute(sql, item)
-        conn.commit()
+        unpacked_items = []
+
+        for item in items:
+            print(item[0])
+            match item[0]:
+                case "V2_99":
+                    unpacked_items.extend([(29591065, 2), (12775351, 2), (55453976, 2), (25942155, 1)])
+                case "V2_100":
+                    unpacked_items.extend([(29591065, 4), (12775351, 4), (55453976, 4), (25942155, 2)])
+                case "V2_101":
+                    unpacked_items.extend([(29591065, 8), (12775351, 8), (55453976, 8), (25942155, 4)])
+                case _:
+                    unpacked_items.append(item)
+        print(unpacked_items)
+        for unpacked_item in unpacked_items:
+            #unique id for each piece within bigger booking id
+            booking_entry_id = generate_unique_8_digit_number()
+            cursor.execute(
+                '''INSERT INTO bookings (booking_entry_id, booking_id, item_id, quantity, from_date, to_date)
+                   VALUES (?, ?, ?, ?, ?, ?)''',
+                (booking_entry_id, booking_id, unpacked_item[0], unpacked_item[1], from_date, to_date)
+            )
+
+        conn.commit() 
         return cursor.lastrowid
     except Error as e:
         print(e)
+    print("HERE")
     
+
+    
+def generate_unique_8_digit_number():
+    number = random.randint(10000000, 99999999)
+    return number
 
 def select_all_bookings(conn):
     """

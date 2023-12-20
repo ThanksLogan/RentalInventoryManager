@@ -7,9 +7,9 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
 from database.connection import create_connection
-from database.operations import print_all_inventory_items, print_all_bookings
+from database.operations import create_booking
 
-def view_inventory():
+def add_item():
     # Define your database path
     database_path = "path_to_your_database.db"
 
@@ -18,11 +18,10 @@ def view_inventory():
 
     # Print all inventory items
     if conn:
-        print_all_inventory_items(conn)
-        print_all_bookings(conn)
+        create_booking(conn, ("123", "1", "4",'2023-12-18', '2023-12-19'))
         conn.close()
     else:
-        print("Error! Cannot create the database connection.")
+        print("Error! Cannot insert into database.")
 
 if __name__ == "__main__":
-    view_inventory()
+    add_item()

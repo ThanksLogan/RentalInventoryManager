@@ -1,4 +1,3 @@
-from sqlite3 import Error
 import sys
 import os
 
@@ -7,22 +6,22 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_root)
 
 from database.connection import create_connection
-from database.operations import print_all_inventory_items, print_all_bookings
+from database.schema import create_bookings_table
 
-def view_inventory():
+def initialize_db():
     # Define your database path
     database_path = "path_to_your_database.db"
 
     # Create a database connection
     conn = create_connection(database_path)
 
-    # Print all inventory items
-    if conn:
-        print_all_inventory_items(conn)
-        print_all_bookings(conn)
+    # Create the inventory table
+    if conn is not None:
+        create_bookings_table(conn)
+        print("Bookings table created successfully.")
         conn.close()
     else:
         print("Error! Cannot create the database connection.")
 
 if __name__ == "__main__":
-    view_inventory()
+    initialize_db()

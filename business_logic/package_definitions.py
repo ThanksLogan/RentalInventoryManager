@@ -22,5 +22,5 @@ packages = {
     "ultra_100": {"ultra_round": 2, "LED": 4, "ultra_ serpentine": 4, "ultra_ rectangle": 4},
     "ultra_101": {"ultra_round": 3, "LED": 8, "ultra_ serpentine": 8, "ultra_ rectangle": 8}
 
-#TODO: ADD BOHO BEIGE AND OLD CALIFORNIA
+#TODO: ADD BOHO BEIGE AND OLD CALIFORNIA AND WHISKEY
 }

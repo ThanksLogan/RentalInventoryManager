@@ -8,6 +8,7 @@ sys.path.append(project_root)
 
 from database.connection import create_connection
 from database.operations import create_inventory_item
+from database.operations import create_booking
 
 def add_item():
     # Define your database path

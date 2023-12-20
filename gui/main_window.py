@@ -72,4 +72,30 @@ class MainWindow(QMainWindow):
 
     def on_item_clicked(self, item):
         print("Clicked item:", item.text())
+
+    def on_item_selected(self):
+        selected_item = self.get_selected_item()  # Implement this method
+        selected_dates = self.get_selected_dates()  # Implement this method
+        availability = self.check_availability(selected_item, selected_dates)
+        self.display_availability(availability)
+
+    def get_selected_item(self):
+        # Logic to get the selected item's identifier from the list widget
+        pass
+
+    def get_selected_dates(self):
+        # Logic to get the selected 'from' and 'to' dates from the calendar
+        pass
+
+    def check_availability(self, item, dates):
+        # Logic to check the database for the item's availability
+        # This involves querying the bookings table
+        pass
+
+    def display_availability(self, availability):
+        # Logic to display the availability status to the user
+        pass
+    
+
+
 # The rest of your class remains unchanged

@@ -1,35 +1,75 @@
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QCalendarWidget, QLabel
-from .calendar_view import CalendarView
-from .inventory_view import InventoryView
+from PyQt5 import uic
+from PyQt5.QtWidgets import QMainWindow, QListWidgetItem
+from .add_event_dialog import AddEventDialog
+from business_logic import package_definitions
+import os
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        ui_path = os.path.join(os.path.dirname(__file__), 'LujoIMS_UI_v1.1.ui')
+        uic.loadUi(ui_path, self)
 
-        # Set the title and size of the main window
-        self.setWindowTitle('Furniture Rental Inventory Manager')
-        self.setGeometry(100, 100, 800, 600)  # x, y, width, height
+        self.init_ui()
 
-        # Create a central widget and set a layout for it
-        central_widget = QWidget(self)
-        self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
+    def init_ui(self):
+        # Connect the calendar widgets to update methods
+        self.fromDateCalendar.selectionChanged.connect(self.update_from_date_time)
+        self.toDateCalendar.selectionChanged.connect(self.update_to_date_time)
 
-        # Create and add a calendar widget
-        self.calendar = CalendarView(self)
-        layout.addWidget(self.calendar)
+        # Assuming the object names are fromDateCalendar, toDateCalendar, and viewAvailabilityButton
+        # Connect the View Availability button
+        self.viewAvailabilityButton.clicked.connect(self.on_view_availability)
 
-        # Inside the MainWindow class
-        self.inventory_view = InventoryView(self)
-        layout.addWidget(self.inventory_view)
+        # Initialize attributes for the selected dates
+        self.from_date = None
+        self.to_date = None
 
-        # Create and add a label to display information
-        self.info_label = QLabel('Select a date to view inventory', self)
-        layout.addWidget(self.info_label)
+        self.populate_list_widget()
 
-        # Additional setup (e.g., connecting signals to slots) can go here
+    def update_from_date_time(self):
+        selected_date = self.fromDateCalendar.selectedDate()
+        self.fromDateTimeEdit.setDateTime(selected_date.startOfDay())
+    def update_to_date_time(self):
+        selected_date = self.toDateCalendar.selectedDate()
+        self.toDateTimeEdit.setDateTime(selected_date.startOfDay())
 
-    # Method to update info label, can be connected to calendar signals
-    def update_info_label(self, date):
-        # Placeholder for logic to update the info label based on the selected date
-        self.info_label.setText(f"Selected Date: {date.toString()}")
+    def on_view_availability(self):
+        # Get the selected dates from the calendar widgets
+        self.from_date = self.fromDateCalendar.selectedDate()
+        self.to_date = self.toDateCalendar.selectedDate()
+
+        # Check if both dates are selected
+        if self.from_date and self.to_date:
+            # Switch to the second page of the QStackedWidget
+            # Assuming your QStackedWidget's name is mainStackedWidget
+            self.stackedWidget.setCurrentIndex(1)
+        else:
+            # Handle the case where one or both dates are not selected
+            print("Please select both 'from' and 'to' dates.")
+
+    def populate_list_widget(self):
+        # Assuming your QListWidget's name is furnitureListWidget
+        for item_name in self.fetch_v2():
+            item = QListWidgetItem(item_name)
+            self.v2ListWidget.addItem(item)
+
+        for item_name in self.fetch_legacy():
+            item = QListWidgetItem(item_name) 
+            self.legacyListWidget.addItem(item)
+        # Connect item click signal
+        self.v2ListWidget.itemClicked.connect(self.on_item_clicked)
+        self.legacyListWidget.itemClicked.connect(self.on_item_clicked)
+
+    def fetch_v2(self):
+        # Fetch furniture items from your database or data source
+        return ["V2 Lounge 98", "V2 Lounge 99", "V2 Lounge 100", "V2 Lounge 101", "V2 Armless Chair", "V2 Corner Chair", "V2 Ottoman", "V2 Square"]  # item headers
+    def fetch_legacy(self):
+        return ["Legacy Lounge 98", "Legacy Lounge 99","Legacy Lounge 100","Legacy Lounge 101", 
+                "Legacy Armless Chair", "Legacy Corner Chair", "Legacy Ottoman", "Legacy Square",
+                "Legacy Big Ottoman", "Legacy Backed Ottoman", "Legacy Rectangle"]
+    
+
+    def on_item_clicked(self, item):
+        print("Clicked item:", item.text())
+# The rest of your class remains unchanged

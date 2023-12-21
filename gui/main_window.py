@@ -47,15 +47,6 @@ class MainWindow(QMainWindow):
         # Connect the Done button 
         self.doneButton.clicked.connect(self.on_done_clicked)
 
-        # makes it run left to right on currently selected items
-        self.currentlySelectedListWidget.setViewMode(QListWidget.IconMode)
-        self.currentlySelectedListWidget.setFlow(QListWidget.LeftToRight)
-        self.currentlySelectedListWidget.setWrapping(False)
-        self.currentlySelectedListWidget.setResizeMode(QListWidget.Adjust)
-
-        
-
-
     def update_from_date_time(self):
         selected_date = self.fromDateCalendar.selectedDate()
         self.fromDateTimeEdit.setDateTime(selected_date.startOfDay())
@@ -120,17 +111,8 @@ class MainWindow(QMainWindow):
         # Logic to get the selected 'from' and 'to' dates from the calendar
         # Tuple?
         return (self.from_date, self.to_date)
-
-    def check_availability(self, item, dates):
-        # Logic to check the database for the item's availability
-        # This involves querying the bookings table
-        pass
-
-    def display_availability(self, availability):
-        # Logic to display the availability status to the user
-        pass
-    '''
-
+  '''
+    
     def on_add_item_clicked(self):
         # Check if an item has been selected
         if self.selected_item_name is not None:
@@ -153,6 +135,8 @@ class MainWindow(QMainWindow):
             return self.v2ListWidget
         elif current_tab_index == 1:
             return self.legacyListWidget
+        elif current_tab_index == 2:
+            return self.ultraListWidget
         # Add more conditions for other tabs
         # ...
         else:
@@ -166,7 +150,6 @@ class MainWindow(QMainWindow):
             item_id = self.get_item_id(item_name)
             items_to_process.append((item_id, item_quantity))
         # Gather item IDs from the second list
-        #items_to_book = [self.get_item_id(item.text()) for item in self.get_all_items(self.currentlySelectedListWidget)]
         # items to book list will look like: [("10125473", 4), ("V299", 1)] <- list of tuples
         # Call database function to create booking
         self.create_booking(items_to_process)
@@ -177,13 +160,8 @@ class MainWindow(QMainWindow):
         quantity = int(quantity_part)
         return name_part, quantity
 
-    def get_all_items(self, list_widget):
-        # Retrieve all items from a QListWidget
-        return [list_widget.item(i) for i in range(list_widget.count())]
-
     def get_item_id(self, item_name):
         # Implement logic to retrieve item ID based on item name
-        
         match item_name: # TODO: id for LED: 56556348
             case "V2 Lounge 99":
                 return "V2_99"

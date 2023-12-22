@@ -1,0 +1,14 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>Picture1.png</file>
+  </qresource>
+  <qresource prefix="newPrefix">
+    <file>lujoLogo.png</file>
+  </qresource>
+  <qresource prefix="newPrefix">
+    <file>lujoLogo.png</file>
+  </qresource>
+  <qresource prefix="newPrefix">
+    <file>lujoLogo.png</file>
+  </qresource>
+</RCC>

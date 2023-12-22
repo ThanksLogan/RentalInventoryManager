@@ -1,4 +1,5 @@
 from sqlite3 import Error
+import sqlite3
 import random
 
 
@@ -61,15 +62,26 @@ def create_booking(conn, items, from_date, to_date):
         unpacked_items = []
 
         for item in items:
-            print(item[0])
+            package_quantity = item[1]  # The quantity of the package
             match item[0]:
                 case "V2_99":
-                    unpacked_items.extend([(29591065, 2), (12775351, 2), (55453976, 2), (25942155, 1)])
+                    # Multiply each item quantity in the package by the package quantity
+                    unpacked_items.extend([(29591065, 2 * package_quantity), 
+                                           (12775351, 2 * package_quantity), 
+                                           (55453976, 2 * package_quantity), 
+                                           (25942155, 1 * package_quantity)])
                 case "V2_100":
-                    unpacked_items.extend([(29591065, 4), (12775351, 4), (55453976, 4), (25942155, 2)])
+                    unpacked_items.extend([(29591065, 4 * package_quantity), 
+                                           (12775351, 4 * package_quantity), 
+                                           (55453976, 4 * package_quantity), 
+                                           (25942155, 2 * package_quantity)])
                 case "V2_101":
-                    unpacked_items.extend([(29591065, 8), (12775351, 8), (55453976, 8), (25942155, 4)])
+                    unpacked_items.extend([(29591065, 8 * package_quantity), 
+                                           (12775351, 8 * package_quantity), 
+                                           (55453976, 8 * package_quantity), 
+                                           (25942155, 4 * package_quantity)])
                 case _:
+                    # For individual items, just add them as they are
                     unpacked_items.append(item)
         print(unpacked_items)
         for unpacked_item in unpacked_items:
@@ -117,3 +129,48 @@ def print_all_bookings(conn):
             print(f"booking entry id: {item[0]}, booking: {item[1]}, item id: {item[2]}, quantity booked: {item[3]}, from date: {item[4]}, to date: {item[5]}")
     except Error as e:
         print(e)
+
+
+def get_available_quantity(conn, item_id, desired_from_date, desired_to_date):
+    """
+    Check the available quantity of an item for a specific date range.
+
+    :param conn: previously established sql database file connection in main_window
+    :param item_id: ID of the item to check
+    :param desired_from_date: Start date of the period (format "YYYY-MM-DD")
+    :param desired_to_date: End date of the period (format "YYYY-MM-DD")
+    :return: Available quantity of the item
+    """
+    try:
+        # Connect to the SQLite database
+        cursor = conn.cursor()
+
+        # Prepare the SQL query
+        sql = '''
+            SELECT 
+                i.quantity - IFNULL(SUM(b.quantity), 0) as available_quantity
+            FROM 
+                furniture_items i
+            LEFT JOIN 
+                bookings b ON i.item_id = b.item_id 
+                AND NOT (b.to_date < ? OR b.from_date > ?)
+            WHERE 
+                i.item_id = ?
+            GROUP BY 
+                i.item_id;
+        '''
+
+        # Execute the query
+        cursor.execute(sql, (desired_from_date, desired_to_date, item_id))
+        result = cursor.fetchone()
+
+        return result[0] if result else None
+
+    except Error as e:
+        print(f"SQLite error: {e}")
+        return None
+
+
+
+# available_quantity = get_available_quantity(db_path, 123, "2023-01-01", "2023-01-10")
+

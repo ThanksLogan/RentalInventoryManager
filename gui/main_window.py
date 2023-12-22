@@ -1,10 +1,12 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QListWidgetItem
 from PyQt5.QtWidgets import QListWidget
+from PyQt5.QtGui import QFontDatabase
+from PyQt5 import QtGui 
 
 from .add_event_dialog import AddEventDialog
 from business_logic import package_definitions
-from database.operations import create_booking
+from database.operations import create_booking, get_available_quantity
 from scripts import view_db
 import os
 
@@ -17,11 +19,24 @@ class MainWindow(QMainWindow):
         '''Initializations'''
         self.selected_item_name = None  # Initialize selected_item_name
 
+
         self.init_ui()
         #self.currently_selected_item = None  # Attribute to store the selected item
 
 
     def init_ui(self):
+        self.apply_stylesheet() 
+        self.label.setPixmap(QtGui.QPixmap("C:/InventoryManager/RentalInventoryManager/gui/qt images/lujoLogo.png"))
+# C:\InventoryManager\RentalInventoryManager\gui
+        # database connection
+        self.conn = self.get_database_connection()
+
+        # lists of packages with items and their quantities
+        # order: armless, ottoman, squares, corners
+        self.v2_99 = [(29591065, 2), (12775351, 2), (55453976, 2), (25942155, 1)]
+        self.v2_100 = [(29591065, 4), (12775351, 4), (55453976, 4), (25942155, 2)]
+        self.v2_101 = [(29591065, 8), (12775351, 8), (55453976, 8), (25942155, 4)]
+
         # Connect the calendar widgets to update methods
         self.fromDateCalendar.selectionChanged.connect(self.update_from_date_time)
         self.toDateCalendar.selectionChanged.connect(self.update_to_date_time)
@@ -44,8 +59,115 @@ class MainWindow(QMainWindow):
 
         # Connect the Add button
         self.addPushButton.clicked.connect(self.on_add_item_clicked)
+
+        # Connect the Remove Button
+        self.removePushButton.clicked.connect(self.on_remove_item_clicked)
+
         # Connect the Done button 
         self.doneButton.clicked.connect(self.on_done_clicked)
+
+    def apply_stylesheet(self):
+        # Load the Inter font family
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Black.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Bold.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-ExtraBold.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-ExtraLight.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Light.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Medium.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Regular.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-SemiBold.ttf")
+        QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Thin.ttf")
+        # Define your CSS styles
+        css = """
+        QWidget#Form {
+            background-color: #121212; /* Dark background color */
+        }
+        QGraphicsView#graphicsView {
+           background-color: #252525; /* Slightly lighter dark background */
+        }
+        /* Styles for the main graphics view background */
+        #graphicsView_2 {
+            background-color: #121212; /* Dark grey background */
+        }
+
+        /* Styles for the main title label */
+        QLabel#label_6 {
+            color: white; /* White text for better contrast on dark background */
+            font-family: 'Inter-Bold', sans-serif;
+            font-size: 12pt; /* Adjust size as needed */
+            text-align: center; /* Center the text */
+            padding: 10px; /* Add some padding */
+        }
+
+        /* Styles for lines */
+        Line {
+            background-color: #333333; /* Dark line color */
+        }
+
+        /* Styles for buttons */
+        QPushButton {
+            border: 2px solid #6c6c6c;
+            border-radius: 5px;
+            background-color: #353535; /* Dark grey background */
+            color: #DDDDDD; /* Light grey text */
+            font-family: 'Inter-Bold', sans-serif;
+            font-size: 10pt;
+            padding: 5px;
+        }
+        
+        QPushButton:hover {
+            background-color: #434343; /* Slightly lighter grey for hover */
+        }
+
+        QPushButton:pressed {
+            background-color: #5c5c5c; /* Even lighter grey for pressed */
+        }
+
+        
+
+        /* Styles for spin boxes */
+        QSpinBox {
+            background-color: #454545;
+            color: #DDDDDD;
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            border: 1px solid #6c6c6c;
+            border-radius: 5px;
+        }
+        
+
+        /* Styles for text edits */
+        QTextEdit {
+            background-color: #252525;
+            color: #DDDDDD;
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            border: 1px solid #6c6c6c;
+            border-radius: 5px;
+        }
+
+        /* Styles for table widgets */
+        QTableWidget {
+            background-color: #252525;
+            color: #DDDDDD;
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            border: 1px solid #6c6c6c;
+            border-radius: 5px;
+        }
+
+                /* Styles for DateTimeEdit Widgets */
+        QDateTimeEdit {
+            background-color: #454545;
+            color: #DDDDDD;
+            border: 1px solid #6c6c6c;
+            border-radius: 5px;
+            font-size: 10pt;
+        }
+
+
+        """
+        self.setStyleSheet(css)
 
     def update_from_date_time(self):
         selected_date = self.fromDateCalendar.selectedDate()
@@ -83,9 +205,9 @@ class MainWindow(QMainWindow):
 
     def fetch_v2(self):
         # Fetch furniture items from your database or data source
-        return ["V2 Lounge 98", "V2 Lounge 99", "V2 Lounge 100", "V2 Lounge 101", "V2 Armless Chair", "V2 Corner Chair", "V2 Ottoman", "V2 Square"]  # item headers
+        return ["Package: V2 Lounge 98", "Package: V2 Lounge 99", "Package: V2 Lounge 100", "Package: V2 Lounge 101", "V2 Armless Chair", "V2 Corner Chair", "V2 Ottoman", "V2 Square"]  # item headers
     def fetch_legacy(self):
-        return ["Legacy Lounge 98", "Legacy Lounge 99","Legacy Lounge 100","Legacy Lounge 101", 
+        return ["Package: Legacy Lounge 98", "Package: Legacy Lounge 99","Package: Legacy Lounge 100","Package: Legacy Lounge 101", 
                 "Legacy Armless Chair", "Legacy Corner Chair", "Legacy Ottoman", "Legacy Square",
                 "Legacy Big Ottoman", "Legacy Backed Ottoman", "Legacy Rectangle"]
     
@@ -95,6 +217,7 @@ class MainWindow(QMainWindow):
         self.currently_selected_item = item
 
     def on_item_selected(self):
+
         # Get the selected item from the active QListWidget
         current_list_widget = self.get_active_list_widget()
         selected_item = current_list_widget.currentItem()
@@ -102,6 +225,79 @@ class MainWindow(QMainWindow):
             self.selected_item_name = selected_item.text()
         else:
             self.selected_item_name = None
+
+        ''' check if it's a package or an individual item '''
+        if(self.selected_item_name[0] == 'P'):
+            max_quantity = self.unpack_and_get_max_quantity(self.selected_item_name)
+        else:
+            max_quantity = get_available_quantity(self.conn,
+                                                  self.get_item_id(self.selected_item_name), 
+                                                   self.from_date.toString("yyyy-MM-dd"), 
+                                                   self.to_date.toString("yyyy-MM-dd"))
+        self.spinBox.setMaximum(max_quantity)
+        
+    def unpack_and_get_max_quantity(self, item_name):
+        ''' 
+        Check amount of pkgs you can make 
+        handle item_and_inStock here [8,8,8,4] for example
+        '''
+        match item_name:
+            case "Package: V2 Lounge 99":
+                item_and_inStock = self.loop_and_unpack(self.v2_99)
+                item_list = item_and_inStock[0] # [#,#,#,#]
+                weakLink = item_list[0] // self.v2_99[0][1] # starter
+                print("item_list: ", item_list, "  weaklink: ", weakLink, " v2_99[3][1]", self.v2_99[3][1])
+                for i, item_amount in enumerate(item_list):
+                    # this gets the amount for the package and divides whats available
+                    quantity = item_amount // self.v2_99[i][1]
+                    if(weakLink >= quantity):
+                        weakLink = quantity
+                    # weak link should equal the max amount of pkgs u can make out of whats available
+
+            case "Package: V2 Lounge 100":
+                item_and_inStock = self.loop_and_unpack(self.v2_100)
+                item_list = item_and_inStock[0] # [#,#,#,#]
+                weakLink = item_list[0] // self.v2_100[0][1] # starter
+                for i, item_amount in enumerate(item_list):
+                    # this gets the amount for the package and divides whats available
+                    quantity = item_amount // self.v2_100[i][1]
+                    if(weakLink >= quantity):
+                        weakLink = quantity
+                    # weak link should equal the max amount of pkgs u can make out of whats available
+
+
+            case "Package: V2 Lounge 101":
+                item_and_inStock = self.loop_and_unpack(self.v2_101)
+                item_list = item_and_inStock[0] # item_list will be in form: [#,#,#,#]
+                weakLink = item_list[0] // self.v2_101[0][1] # starter: first item of list is [0] // armless
+                for i, item_amount in enumerate(item_list):
+                    # this gets the amount for the package and divides whats available
+                    quantity = item_amount // self.v2_101[i][1]
+                    if(weakLink >= quantity):
+                        weakLink = quantity
+                    # weak link should equal the max amount of pkgs u can make out of whats available
+        ''' If you cant make a full package, return 0 as the max quantity'''
+        if(item_and_inStock[1] == False):
+            return 0 
+        else:
+            return weakLink
+        
+        
+    def loop_and_unpack(self, pkg):
+        quantities = []
+        enough = True
+        for item in pkg:
+            quantity = get_available_quantity(self.conn, item[0], 
+                                            self.from_date.toString("yyyy-MM-dd"),
+                                            self.to_date.toString("yyyy-MM-dd"))
+            if quantity is None or quantity < item[1]:
+                print(f"not enough of item_id: {item[0]}")
+                enough = False
+                # Consider breaking out of the loop if one item is not enough
+            else:
+                quantities.append(quantity)  # Use append instead of extend
+        return (quantities, enough)
+
 
     '''def get_selected_items(self):
         # Logic to get the selected item's identifier from the list widget
@@ -127,6 +323,17 @@ class MainWindow(QMainWindow):
         else:
             print("No item selected")  # Or show a message to the user
 
+    def on_remove_item_clicked(self):
+        # Check if an item is selected
+        if self.selected_item_name:
+            # Find the row of the selected item
+            row = self.currentlySelectedListWidget.row(self.selected_item_name)
+            # Remove the item from the list
+            self.currentlySelectedListWidget.takeItem(row)
+        else:
+            print("No item selected to remove")  # Or show a message to the user
+
+
     def get_active_list_widget(self):
         # Assuming you have a QTabWidget named tabWidget
         current_tab_index = self.tabWidget.currentIndex()
@@ -143,6 +350,11 @@ class MainWindow(QMainWindow):
             return None
 
     def on_done_clicked(self):
+        # Save the current state of the currentlySelectedListWidget
+        self.saved_items = []
+        for i in range(self.currentlySelectedListWidget.count()):
+            item_text = self.currentlySelectedListWidget.item(i).text()
+            self.saved_items.append(item_text)
         items_to_process = []
         for i in range(self.currentlySelectedListWidget.count()):
             item_text = self.currentlySelectedListWidget.item(i).text()
@@ -153,6 +365,7 @@ class MainWindow(QMainWindow):
         # items to book list will look like: [("10125473", 4), ("V299", 1)] <- list of tuples
         # Call database function to create booking
         self.create_booking(items_to_process)
+        self.stackedWidget.setCurrentIndex(2)  # Assuming page 3 is at index 2
         
     def parse_item_and_quantity(self, item_text):
         # Example item_text: "ItemName - Quantity: 4"
@@ -163,13 +376,13 @@ class MainWindow(QMainWindow):
     def get_item_id(self, item_name):
         # Implement logic to retrieve item ID based on item name
         match item_name: # TODO: id for LED: 56556348
-            case "V2 Lounge 99":
+            case "Package: V2 Lounge 99":
                 return "V2_99"
-            case "V2 Lounge 100":
+            case "Package: V2 Lounge 100":
                 return "V2_100"
-            case "V2 Lounge 101":
+            case "Package: V2 Lounge 101":
                 return "V2_101"
-            case "V2 Lounge 98":
+            case "Package: V2 Lounge 98":
                 return "V2_98"
             case "Legacy Backed Ottoman":
                 return "10125473"
@@ -198,13 +411,12 @@ class MainWindow(QMainWindow):
 
     #param: items_to_book: tuple (item(id), quantity)
     def create_booking(self, items_to_book):
-        conn = self.get_database_connection()
+        #conn = self.get_database_connection()
         # Implement or call a function to handle booking logic
         from_date_string = self.from_date.toString("yyyy-MM-dd")
         to_date_string = self.to_date.toString("yyyy-MM-dd")
         print(from_date_string, to_date_string)
-        create_booking(conn, items_to_book, from_date_string, to_date_string)
-
+        create_booking(self.conn, items_to_book, from_date_string, to_date_string)
 
     def get_database_connection(self):
         # Implement the logic to create and return a database connection

@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QMainWindow, QListWidgetItem
 from PyQt5.QtWidgets import QListWidget
 from PyQt5.QtGui import QFontDatabase
 from PyQt5 import QtGui 
+from PyQt5.QtCore import Qt
+from .fancyWindow import CustomTitleBar  # Importing CustomTitleBar
+
 
 from .add_event_dialog import AddEventDialog
 from business_logic import package_definitions
@@ -13,7 +16,17 @@ import os
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        ui_path = os.path.join(os.path.dirname(__file__), 'LujoIMS_UI_v1.1.ui')
+
+        # Set window to frameless
+        self.setWindowFlags(Qt.FramelessWindowHint)
+
+        # Set custom window title
+        self.title_bar = CustomTitleBar(self)
+        self.setMenuWidget(self.title_bar) 
+
+
+
+        ui_path = os.path.join(os.path.dirname(__file__), 'LujoIMS_UI_v1.2.ui')
         uic.loadUi(ui_path, self)
 
         '''Initializations'''
@@ -79,6 +92,36 @@ class MainWindow(QMainWindow):
         QFontDatabase.addApplicationFont("C:/Users/forem/Downloads/static/Inter-Thin.ttf")
         # Define your CSS styles
         css = """
+        QMainWindow {
+            background-color: #333; /* Dark background color */
+            border: 1px solid #444; /* Custom border color and thickness */
+            border-radius: 8px; /* Rounded corners for the window */
+            /* Additional styling options can be added here */
+        }
+
+        QMenuBar {
+            background-color: #444; /* Dark background for menu bar */
+            color: white; /* Text color for menu bar */
+            /* Additional styling for menu bar */
+        }
+
+        QMenuBar::item {
+            background-color: transparent; /* Transparent background for menu items */
+            padding: 4px 8px; /* Padding for menu items */
+        }
+
+        QMenuBar::item:selected {
+            background-color: #555; /* Background color for selected menu items */
+        }
+
+        QStatusBar {
+            background-color: #444; /* Dark background for status bar */
+            color: white; /* Text color for status bar */
+            /* Additional styling for status bar */
+        }
+
+        /* You can add more specific styles for other widgets and controls here */
+
         QWidget#Form {
             background-color: #121212; /* Dark background color */
         }

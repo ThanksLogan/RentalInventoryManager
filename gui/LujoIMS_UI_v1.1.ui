@@ -26,7 +26,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QWidget" name="widget" native="true">
@@ -638,7 +638,7 @@ QPushButton:pressed {
        <rect>
         <x>481</x>
         <y>153</y>
-        <width>174</width>
+        <width>211</width>
         <height>71</height>
        </rect>
       </property>
@@ -739,6 +739,22 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="lineEdit_8">
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    color: white; /* White text */
+    background-color: #2b2b2b; /* Dark background for contrast */
+    border: 1px solid #555; /* Slightly lighter border for visibility */
+    border-radius: 4px; /* Rounded corners */
+    padding: 2px; /* Padding for text inside the edit box */
+    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
+    font-size: 11pt; /* Font size */
+}
+</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_11">
          <property name="styleSheet">
@@ -752,6 +768,22 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_2">
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    color: white; /* White text */
+    background-color: #2b2b2b; /* Dark background for contrast */
+    border: 1px solid #555; /* Slightly lighter border for visibility */
+    border-radius: 4px; /* Rounded corners */
+    padding: 2px; /* Padding for text inside the edit box */
+    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
+    font-size: 11pt; /* Font size */
+}
+</string>
          </property>
         </widget>
        </item>
@@ -771,6 +803,22 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_4">
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    color: white; /* White text */
+    background-color: #2b2b2b; /* Dark background for contrast */
+    border: 1px solid #555; /* Slightly lighter border for visibility */
+    border-radius: 4px; /* Rounded corners */
+    padding: 2px; /* Padding for text inside the edit box */
+    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
+    font-size: 11pt; /* Font size */
+}
+</string>
+         </property>
+        </widget>
+       </item>
        <item row="7" column="0">
         <widget class="QLabel" name="label_7">
          <property name="styleSheet">
@@ -784,6 +832,38 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lineEdit_5">
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    color: white; /* White text */
+    background-color: #2b2b2b; /* Dark background for contrast */
+    border: 1px solid #555; /* Slightly lighter border for visibility */
+    border-radius: 4px; /* Rounded corners */
+    padding: 2px; /* Padding for text inside the edit box */
+    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
+    font-size: 11pt; /* Font size */
+}
+</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="lineEdit_6">
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    color: white; /* White text */
+    background-color: #2b2b2b; /* Dark background for contrast */
+    border: 1px solid #555; /* Slightly lighter border for visibility */
+    border-radius: 4px; /* Rounded corners */
+    padding: 2px; /* Padding for text inside the edit box */
+    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
+    font-size: 11pt; /* Font size */
+}
+</string>
          </property>
         </widget>
        </item>
@@ -851,22 +931,6 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="styleSheet">
-          <string notr="true">color: white; /* White text for better contrast on dark background */
-            font-family: 'Inter', sans-serif;
-            font-size: 11pt; /* Adjust size as needed */
-</string>
-         </property>
-         <property name="text">
-          <string>Name</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_12">
          <property name="styleSheet">
@@ -880,38 +944,6 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit">
-         <property name="styleSheet">
-          <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
-</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_2">
-         <property name="styleSheet">
-          <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
-</string>
          </property>
         </widget>
        </item>
@@ -931,8 +963,8 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="lineEdit_4">
+       <item row="8" column="1">
+        <widget class="QLineEdit" name="lineEdit_9">
          <property name="styleSheet">
           <string notr="true">QLineEdit {
     color: white; /* White text */
@@ -947,24 +979,8 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="lineEdit_5">
-         <property name="styleSheet">
-          <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
-</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="lineEdit_6">
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit">
          <property name="styleSheet">
           <string notr="true">QLineEdit {
     color: white; /* White text */
@@ -995,35 +1011,19 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
-        <widget class="QLineEdit" name="lineEdit_8">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_8">
          <property name="styleSheet">
-          <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
+          <string notr="true">color: white; /* White text for better contrast on dark background */
+            font-family: 'Inter', sans-serif;
+            font-size: 11pt; /* Adjust size as needed */
 </string>
          </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QLineEdit" name="lineEdit_9">
-         <property name="styleSheet">
-          <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
-</string>
+         <property name="text">
+          <string>Name</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>

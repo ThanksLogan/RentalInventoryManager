@@ -32,4 +32,7 @@ def delete_booking_rows(db_file, condition):
 
 # Example usage
 db_path = "path_to_your_database.db"
-delete_booking_rows(db_path, "from_date = '2023-12-**'") 
+delete_booking_rows(db_path, "from_date = '2023-10-17'")
+delete_booking_rows(db_path, "from_date = '2023-12-07'")
+delete_booking_rows(db_path, "from_date = '2023-12-04'")
+delete_booking_rows(db_path, "from_date = '2023-11-27'") 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1301</width>
-    <height>764</height>
+    <width>1264</width>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -717,7 +717,7 @@ QPushButton:pressed {
        <rect>
         <x>-20</x>
         <y>-30</y>
-        <width>1291</width>
+        <width>1321</width>
         <height>761</height>
        </rect>
       </property>
@@ -921,7 +921,7 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit">
+         <widget class="QLineEdit" name="lineEdit_1">
           <property name="styleSheet">
            <string notr="true">QLineEdit {
     color: white; /* White text */
@@ -1066,7 +1066,7 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="addPushButton_5">
+      <widget class="QPushButton" name="confirmButton">
        <property name="geometry">
         <rect>
          <x>460</x>
@@ -1293,9 +1293,9 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
       <widget class="QLabel" name="label_37">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>120</x>
          <y>10</y>
-         <width>311</width>
+         <width>301</width>
          <height>35</height>
         </rect>
        </property>
@@ -1316,12 +1316,15 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
       <widget class="QTableWidget" name="tableWidget">
        <property name="geometry">
         <rect>
-         <x>40</x>
-         <y>51</y>
-         <width>481</width>
+         <x>120</x>
+         <y>50</y>
+         <width>301</width>
          <height>221</height>
         </rect>
        </property>
+       <attribute name="horizontalHeaderCascadingSectionResizes">
+        <bool>false</bool>
+       </attribute>
        <column>
         <property name="text">
          <string>Package / Item</string>

@@ -1,9 +1,9 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QListWidgetItem
-from PyQt5.QtWidgets import QListWidget
+from PyQt5.QtWidgets import QMainWindow, QListWidgetItem, QListWidget, QTableWidget, QTableWidgetItem, QFileDialog
 from PyQt5.QtGui import QFontDatabase
 from PyQt5 import QtGui 
 from PyQt5.QtCore import Qt
+
 from .fancyWindow import CustomTitleBar  # Importing CustomTitleBar
 
 
@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
 
         '''Initializations'''
         self.selected_item_name = None  # Initialize selected_item_name
-
+        self.saved_items = None
 
         self.init_ui()
         #self.currently_selected_item = None  # Attribute to store the selected item
@@ -78,6 +78,9 @@ class MainWindow(QMainWindow):
 
         # Connect the Done button 
         self.doneButton.clicked.connect(self.on_done_clicked)
+
+        self.confirmButton.clicked.connect(self.on_confirm_button_clicked)
+
 
     def apply_stylesheet(self):
         # Load the Inter font family
@@ -207,6 +210,34 @@ class MainWindow(QMainWindow):
             border-radius: 5px;
             font-size: 10pt;
         }
+
+        QTableWidget {
+            background-color: #252525; /* Dark grey background */
+            color: #DDDDDD; /* Light grey text for better contrast */
+            font-family: 'Inter-Regular', sans-serif;
+            font-size: 10pt; /* Adjust the font size as needed */
+            border-radius: 5px; /* Rounded corners */
+            border: 1px solid #6c6c6c; /* Border for the table */
+        }
+
+        QTableWidget QHeaderView::section {
+            background-color: #353535; /* Darker grey for header */
+            color: white; /* White text in header */
+            padding: 5px;
+            border: 1px solid #6c6c6c; /* Border for header cells */
+            font-family: 'Inter-Medium', sans-serif; /* Slightly bolder font for headers */
+        }
+
+        QTableWidget::item {
+            background-color: #252525; /* Dark grey background for items */
+            color: #DDDDDD; /* Light grey text for items */
+        }
+
+        QTableWidget::item:selected {
+            background-color: #434343; /* Slightly lighter grey for selected items */
+            color: white; /* White text for selected items */
+        }
+
 
 
         """
@@ -409,6 +440,8 @@ class MainWindow(QMainWindow):
         # Call database function to create booking
         self.create_booking(items_to_process)
         self.stackedWidget.setCurrentIndex(2)  # Assuming page 3 is at index 2
+        self.populate_summary_table()
+
         
     def parse_item_and_quantity(self, item_text):
         # Example item_text: "ItemName - Quantity: 4"
@@ -460,6 +493,93 @@ class MainWindow(QMainWindow):
         to_date_string = self.to_date.toString("yyyy-MM-dd")
         print(from_date_string, to_date_string)
         create_booking(self.conn, items_to_book, from_date_string, to_date_string)
+
+    def populate_summary_table(self):
+        # Clear the table before adding new items
+        self.tableWidget.setRowCount(0)
+        self.tableWidget.setColumnCount(3)
+        self.tableWidget.setHorizontalHeaderLabels(["Item", "Quantity", "Price"])
+
+        for item_text in self.saved_items:
+            row_count = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(row_count)
+
+            item_name, item_quantity = self.parse_item_and_quantity(item_text)
+            # Assume an arbitrary price, modify this part as per your actual pricing logic
+            price = self.calculate_price(item_name, item_quantity)
+
+            # Create QTableWidgetItem for each piece of data
+            item_widget = QTableWidgetItem(item_name)
+            quantity_widget = QTableWidgetItem(str(item_quantity))
+            price_widget = QTableWidgetItem(f"${price:.2f}")
+
+            # Add items to the table
+            self.tableWidget.setItem(row_count, 0, item_widget)
+            self.tableWidget.setItem(row_count, 1, quantity_widget)
+            self.tableWidget.setItem(row_count, 2, price_widget)
+        # Adjust the heights of rows to fit the content
+        self.adjust_table_row_heights()
+
+    def adjust_table_row_heights(self):
+        for row in range(self.tableWidget.rowCount()):
+            self.tableWidget.resizeRowToContents(row)
+
+    def calculate_price(self, item_name, quantity):
+        # Placeholder function to calculate price, modify as needed
+        # Example: return a fixed price per item
+        return 10 * quantity  # Example: $10 per item
+
+    def on_confirm_button_clicked(self):
+        # Collect data from LineEdits
+        line_edit_data = [
+            self.lineEdit_1.text(), 
+            self.lineEdit_2.text(), 
+            self.lineEdit_3.text(),
+            self.lineEdit_4.text(),
+            self.lineEdit_5.text(),
+            self.lineEdit_6.text(),
+            self.lineEdit_7.text(),
+            self.lineEdit_8.text(),
+            self.lineEdit_9.text()]
+
+        # Collect data from QTableWidget
+        table_data = []
+        for row in range(self.tableWidget.rowCount()):
+            row_data = []
+            for column in range(self.tableWidget.columnCount()):
+                item = self.tableWidget.item(row, column)
+                row_data.append(item.text() if item else "")
+            table_data.append(row_data)
+
+        # Format the data into a string
+        agreement_text = self.format_agreement_text(line_edit_data, table_data)
+
+        # Save the file
+        self.save_agreement_to_file(agreement_text)
+
+    def format_agreement_text(self, line_edit_data, table_data):
+        # Format the data into a string that will be written to the file
+        # Customize this according to your needs
+        agreement_text = "Rental Agreement\n\n"
+        agreement_text += "Details:\n"
+        for data in line_edit_data:
+            agreement_text += data + "\n"
+
+        agreement_text += "\nRental Items:\n"
+        for row in table_data:
+            agreement_text += ", ".join(row) + "\n"
+
+        return agreement_text
+
+    def save_agreement_to_file(self, agreement_text):
+        # Open a file dialog for the user to choose where to save the file
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save Agreement", "", "Text Files (*.txt)", options=options)
+        
+        if file_name:
+            with open(file_name, 'w') as file:
+                file.write(agreement_text)
+
 
     def get_database_connection(self):
         # Implement the logic to create and return a database connection

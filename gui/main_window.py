@@ -30,6 +30,46 @@ class MainWindow(QMainWindow):
         uic.loadUi(ui_path, self)
 
         '''Initializations'''
+        # lists of packages with items and their quantities
+        # order: armless, ottoman, squares, corners, TODO: LED cubes
+        self.v2_98 = [(12775351, 2), (55453976, 4)]
+        self.v2_99 = [(29591065, 2), (12775351, 2), (55453976, 2), (25942155, 1)]
+        self.v2_100 = [(29591065, 4), (12775351, 4), (55453976, 4), (25942155, 2)]
+        self.v2_101 = [(29591065, 8), (12775351, 8), (55453976, 8), (25942155, 4)]
+
+        self.legacy_99 = [(42212173, 2), (18612390, 2), (55453976, 2), (25942155, 1)]
+        self.legacy_100 = [(42212173, 4), (18612390, 4), (55453976, 4), (25942155, 2)]
+        self.legacy_101 = [(42212173, 8), (18612390, 8), (55453976, 8), (25942155, 4)]
+        self.legacy_bronze = [(10125473,1), (92857097,1), (16177294,4)]
+        self.legacy_silver = [(10125473,2), (92857097,2), (16177294,4)]
+        self.legacy_gold = [(10125473,4), (92857097,4), (16177294,8)]
+
+        # order: bench, serp, circle (except for ultra 98 its all round) 
+        # TODO: LED cubes
+        self.ultra_98 = [(92857099, 3)]
+        self.ultra_99 = [(92857100, 2), (92857101, 2), (92857099, 1)]
+        self.ultra_100 = [(92857100, 4), (92857101, 4), (92857099, 2)]
+        self.ultra_101 = [(92857100, 8), (92857101, 8), (92857099, 4)]
+        self.package_configurations = {
+            "Package: V2 Lounge 98": self.v2_98,
+            "Package: V2 Lounge 99": self.v2_99,
+            "Package: V2 Lounge 100": self.v2_100,
+            "Package: V2 Lounge 101": self.v2_101,
+
+            "Package: Legacy Lounge 99": self.legacy_99,
+            "Package: Legacy Lounge 100": self.legacy_100,
+            "Package: Legacy Lounge 101": self.legacy_101,
+
+            "Package: Legacy Bronze": self.legacy_bronze,
+            "Package: Legacy Silver": self.legacy_silver,
+            "Package: Legacy Gold": self.legacy_gold,
+
+            "Package: Ultra Lounge 98": self.ultra_98,
+            "Package: Ultra Lounge 99": self.ultra_99,
+            "Package: Ultra Lounge 100": self.ultra_100,
+            "Package: Ultra Lounge 101": self.ultra_101,   
+        }
+
         self.selected_item_name = None  # Initialize selected_item_name
         self.saved_items = None
 
@@ -44,18 +84,13 @@ class MainWindow(QMainWindow):
         # database connection
         self.conn = self.get_database_connection()
 
-        # lists of packages with items and their quantities
-        # order: armless, ottoman, squares, corners
-        self.v2_99 = [(29591065, 2), (12775351, 2), (55453976, 2), (25942155, 1)]
-        self.v2_100 = [(29591065, 4), (12775351, 4), (55453976, 4), (25942155, 2)]
-        self.v2_101 = [(29591065, 8), (12775351, 8), (55453976, 8), (25942155, 4)]
-
         # Connect the calendar widgets to update methods
         self.fromDateCalendar.selectionChanged.connect(self.update_from_date_time)
         self.toDateCalendar.selectionChanged.connect(self.update_to_date_time)
 
         # Assuming the object names are fromDateCalendar, toDateCalendar, and viewAvailabilityButton
         # Connect the View Availability button
+        self.loginPushButton.clicked.connect(self.on_login)
         self.viewAvailabilityButton.clicked.connect(self.on_view_availability)
 
         # Initialize attributes for the selected dates
@@ -250,6 +285,12 @@ class MainWindow(QMainWindow):
         selected_date = self.toDateCalendar.selectedDate()
         self.toDateTimeEdit.setDateTime(selected_date.startOfDay())
 
+    def on_login(self):
+        if self.userLineEdit.text() == "admin" and self.passwordLineEdit.text() == "password":
+            self.stackedWidget.setCurrentIndex(1)
+        else:
+            print("Invalid Credentials. Try 'admin' and 'password'")
+
     def on_view_availability(self):
         # Get the selected dates from the calendar widgets
         self.from_date = self.fromDateCalendar.selectedDate()
@@ -259,7 +300,7 @@ class MainWindow(QMainWindow):
         if self.from_date and self.to_date:
             # Switch to the second page of the QStackedWidget
             # Assuming your QStackedWidget's name is mainStackedWidget
-            self.stackedWidget.setCurrentIndex(1)
+            self.stackedWidget.setCurrentIndex(2)
         else:
             # Handle the case where one or both dates are not selected
             print("Please select both 'from' and 'to' dates.")
@@ -273,17 +314,26 @@ class MainWindow(QMainWindow):
         for item_name in self.fetch_legacy():
             item = QListWidgetItem(item_name) 
             self.legacyListWidget.addItem(item)
+
+        for item_name in self.fetch_ultra():
+            item = QListWidgetItem(item_name) 
+            self.ultraListWidget.addItem(item)
         # Connect item click signal
         self.v2ListWidget.itemClicked.connect(self.on_item_clicked)
         self.legacyListWidget.itemClicked.connect(self.on_item_clicked)
+        self.ultraListWidget.itemClicked.connect(self.on_item_clicked)
 
     def fetch_v2(self):
         # Fetch furniture items from your database or data source
         return ["Package: V2 Lounge 98", "Package: V2 Lounge 99", "Package: V2 Lounge 100", "Package: V2 Lounge 101", "V2 Armless Chair", "V2 Corner Chair", "V2 Ottoman", "V2 Square"]  # item headers
     def fetch_legacy(self):
-        return ["Package: Legacy Lounge 98", "Package: Legacy Lounge 99","Package: Legacy Lounge 100","Package: Legacy Lounge 101", 
+        return ["Package: Legacy Lounge 99","Package: Legacy Lounge 100","Package: Legacy Lounge 101",
+                "Package: Legacy Bronze", "Package: Legacy Silver", "Package: Legacy Gold" 
                 "Legacy Armless Chair", "Legacy Corner Chair", "Legacy Ottoman", "Legacy Square",
                 "Legacy Big Ottoman", "Legacy Backed Ottoman", "Legacy Rectangle"]
+    def fetch_ultra(self):
+        return ["Package: Ultra Lounge 98", "Package: Ultra Lounge 99","Package: Ultra Lounge 100","Package: Ultra Lounge 101", 
+                "Ultra Bench", "Ultra Serpentine", "Ultra Round"]
     
 
     def on_item_clicked(self, item):
@@ -299,7 +349,7 @@ class MainWindow(QMainWindow):
             self.selected_item_name = selected_item.text()
         else:
             self.selected_item_name = None
-
+        print(self.selected_item_name)
         ''' check if it's a package or an individual item '''
         if(self.selected_item_name[0] == 'P'):
             max_quantity = self.unpack_and_get_max_quantity(self.selected_item_name)
@@ -315,46 +365,21 @@ class MainWindow(QMainWindow):
         Check amount of pkgs you can make 
         handle item_and_inStock here [8,8,8,4] for example
         '''
-        match item_name:
-            case "Package: V2 Lounge 99":
-                item_and_inStock = self.loop_and_unpack(self.v2_99)
-                item_list = item_and_inStock[0] # [#,#,#,#]
-                weakLink = item_list[0] // self.v2_99[0][1] # starter
-                print("item_list: ", item_list, "  weaklink: ", weakLink, " v2_99[3][1]", self.v2_99[3][1])
-                for i, item_amount in enumerate(item_list):
-                    # this gets the amount for the package and divides whats available
-                    quantity = item_amount // self.v2_99[i][1]
-                    if(weakLink >= quantity):
-                        weakLink = quantity
-                    # weak link should equal the max amount of pkgs u can make out of whats available
+         # Get the package configuration based on item_name
+        package_configuration = self.package_configurations.get(item_name)
+        
+        if package_configuration is None:
+            return 0  # Or handle the error as needed
 
-            case "Package: V2 Lounge 100":
-                item_and_inStock = self.loop_and_unpack(self.v2_100)
-                item_list = item_and_inStock[0] # [#,#,#,#]
-                weakLink = item_list[0] // self.v2_100[0][1] # starter
-                for i, item_amount in enumerate(item_list):
-                    # this gets the amount for the package and divides whats available
-                    quantity = item_amount // self.v2_100[i][1]
-                    if(weakLink >= quantity):
-                        weakLink = quantity
-                    # weak link should equal the max amount of pkgs u can make out of whats available
+        item_and_inStock = self.loop_and_unpack(package_configuration)
+        item_list = item_and_inStock[0]
+        weakLink = item_list[0] // package_configuration[0][1]
 
+        for i, item_amount in enumerate(item_list):
+            quantity = item_amount // package_configuration[i][1]
+            weakLink = min(weakLink, quantity)
 
-            case "Package: V2 Lounge 101":
-                item_and_inStock = self.loop_and_unpack(self.v2_101)
-                item_list = item_and_inStock[0] # item_list will be in form: [#,#,#,#]
-                weakLink = item_list[0] // self.v2_101[0][1] # starter: first item of list is [0] // armless
-                for i, item_amount in enumerate(item_list):
-                    # this gets the amount for the package and divides whats available
-                    quantity = item_amount // self.v2_101[i][1]
-                    if(weakLink >= quantity):
-                        weakLink = quantity
-                    # weak link should equal the max amount of pkgs u can make out of whats available
-        ''' If you cant make a full package, return 0 as the max quantity'''
-        if(item_and_inStock[1] == False):
-            return 0 
-        else:
-            return weakLink
+        return weakLink
         
         
     def loop_and_unpack(self, pkg):
@@ -415,9 +440,10 @@ class MainWindow(QMainWindow):
         if current_tab_index == 0:
             return self.v2ListWidget
         elif current_tab_index == 1:
-            return self.legacyListWidget
-        elif current_tab_index == 2:
             return self.ultraListWidget
+        elif current_tab_index == 2:
+            return self.legacyListWidget
+        
         # Add more conditions for other tabs
         # ...
         else:
@@ -439,7 +465,7 @@ class MainWindow(QMainWindow):
         # items to book list will look like: [("10125473", 4), ("V299", 1)] <- list of tuples
         # Call database function to create booking
         self.create_booking(items_to_process)
-        self.stackedWidget.setCurrentIndex(2)  # Assuming page 3 is at index 2
+        self.stackedWidget.setCurrentIndex(3)  # Assuming page 3 is at index 2
         self.populate_summary_table()
 
         

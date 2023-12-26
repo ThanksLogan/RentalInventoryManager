@@ -63,163 +63,8 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
-    <widget class="QWidget" name="page_0">
-     <widget class="QGraphicsView" name="graphicsView_5">
-      <property name="geometry">
-       <rect>
-        <x>-40</x>
-        <y>-20</y>
-        <width>1341</width>
-        <height>761</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(18, 18, 18);
-</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="widget_7" native="true">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>160</y>
-        <width>381</width>
-        <height>251</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:  rgb(27, 27, 27);
-border-radius: 20px;  /* Adjust the radius as needed */</string>
-      </property>
-      <widget class="QWidget" name="verticalLayoutWidget_4">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>10</y>
-         <width>271</width>
-         <height>141</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_21">
-          <property name="styleSheet">
-           <string notr="true">QLabel{
-            color: #DDDDDD; /* Light grey text on dark background */
-            font-family: 'Inter ExtraBold', sans-serif;
-            font-size: 22pt; /* Adjust size as needed */
-}</string>
-          </property>
-          <property name="text">
-           <string>Log into Lujo IMS</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="passwordLineEdit">
-            <property name="styleSheet">
-             <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
-</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="passwordLabel">
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-            color: #DDDDDD; /* Light grey text on dark background */
-            font-family: 'Inter', sans-serif;
-            font-size: 11pt; /* Adjust size as needed */
-}</string>
-            </property>
-            <property name="text">
-             <string>Password:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="usernameLabel">
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-            color: #DDDDDD; /* Light grey text on dark background */
-            font-family: 'Inter', sans-serif;
-            font-size: 11pt; /* Adjust size as needed */
-}</string>
-            </property>
-            <property name="text">
-             <string>Username:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="userLineEdit">
-            <property name="styleSheet">
-             <string notr="true">QLineEdit {
-    color: white; /* White text */
-    background-color: #2b2b2b; /* Dark background for contrast */
-    border: 1px solid #555; /* Slightly lighter border for visibility */
-    border-radius: 4px; /* Rounded corners */
-    padding: 2px; /* Padding for text inside the edit box */
-    font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
-}
-</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QPushButton" name="loginPushButton">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>190</y>
-         <width>121</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-	
-	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
-    border: 2px solid #8f8f91;
-    border-radius: 6px;
-    background-color: #353535;
-    min-width: 80px;
-	color: rgb(229, 229, 229);
-}
-
-QPushButton:hover {
-    border-color: #1a1a1a;
-}
-
-QPushButton:pressed {
-    background-color: #292929;
-}</string>
-       </property>
-       <property name="text">
-        <string>Log In</string>
-       </property>
-      </widget>
-     </widget>
-    </widget>
     <widget class="QWidget" name="page">
      <widget class="QWidget" name="widget" native="true">
       <property name="geometry">
@@ -605,7 +450,7 @@ QTabBar::tab:!selected {
 }  </string>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="iconSize">
            <size>
@@ -830,7 +675,7 @@ QPushButton:pressed {
         <rect>
          <x>490</x>
          <y>70</y>
-         <width>291</width>
+         <width>271</width>
          <height>431</height>
         </rect>
        </property>
@@ -851,7 +696,7 @@ QPushButton:pressed {
            </widget>
           </item>
           <item>
-           <widget class="QListWidget" name="existingBookingsListWidget">
+           <widget class="QListWidget" name="currentlySelectedListWidget_2">
             <property name="styleSheet">
              <string notr="true">QListWidget {
     background-color: #454545; /* Dark grey background */

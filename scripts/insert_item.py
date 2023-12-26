@@ -19,7 +19,8 @@ def add_item():
 
     # Print all inventory items
     if conn:
-        create_inventory_item(conn, ("test_item", "1", "10"))
+        create_inventory_item(conn, ("test item", "1", "1"))
+
         conn.close()
     else:
         print("Error! Cannot insert into database.")

@@ -36,3 +36,18 @@ def create_bookings_table(conn):
         conn.commit()
     except Error as e:
         print(e)
+
+def create_user_table(conn):
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_key INTEGER PRIMARY KEY,
+                username CHAR,
+                password CHAR,
+            );
+        """)
+        conn.commit()
+    except Error as e:
+        print(e)

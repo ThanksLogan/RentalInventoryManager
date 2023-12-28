@@ -132,9 +132,13 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
     border-radius: 4px; /* Rounded corners */
     padding: 2px; /* Padding for text inside the edit box */
     font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
+    font-size: 5pt; /* Font size */
+	min-height: 20px
 }
 </string>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
             </property>
            </widget>
           </item>
@@ -176,7 +180,8 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
     border-radius: 4px; /* Rounded corners */
     padding: 2px; /* Padding for text inside the edit box */
     font-family: 'Inter', sans-serif; /* Inter font with sans-serif fallback */
-    font-size: 11pt; /* Font size */
+    font-size: 10pt; /* Font size */
+	min-height: 20px
 }
 </string>
             </property>
@@ -605,7 +610,7 @@ QTabBar::tab:!selected {
 }  </string>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="iconSize">
            <size>

@@ -1,4 +1,0 @@
-mkdRequirements for the app:
--- Calendar view of all dates, and be able to fill them in
--- Database 
--- Excel Spreadsheet connectivity

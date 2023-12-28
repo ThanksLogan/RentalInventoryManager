@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         self.label.setPixmap(QtGui.QPixmap("C:/InventoryManager/RentalInventoryManager/gui/qt images/lujoLogo.png"))
 # C:\InventoryManager\RentalInventoryManager\gui
         # database connection
-        self.conn = create_connection("path_to_your_database.db")
+        self.conn = create_connection("db.db")
 
         # Connect the calendar widgets to update methods
         self.fromDateCalendar.selectionChanged.connect(self.update_from_date_time)

@@ -1,4 +1,6 @@
 import sqlite3
+from datetime import datetime, timedelta
+
 
 def delete_booking_rows(db_file, condition):
     """
@@ -32,7 +34,9 @@ def delete_booking_rows(db_file, condition):
 
 # Example usage
 db_path = "path_to_your_database.db"
-delete_booking_rows(db_path, "from_date = '2023-10-17'")
-delete_booking_rows(db_path, "from_date = '2023-12-07'")
-delete_booking_rows(db_path, "from_date = '2023-12-04'")
-delete_booking_rows(db_path, "from_date = '2023-11-27'") 
+date = datetime(2023, 11, 1)
+# Loop through November and December (61 days total)
+for _ in range(61):
+    #formatted_date = date.strftime('%Y-%m-%d')
+    delete_booking_rows(db_path, formatted_date)
+    date += timedelta(days=1)  # Increment the day by 1

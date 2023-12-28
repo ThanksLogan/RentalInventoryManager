@@ -32,7 +32,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>30</y>
+      <y>20</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -914,8 +914,41 @@ QPushButton:pressed {
 </string>
       </property>
      </widget>
+     <widget class="QPushButton" name="backPushButton">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>10</y>
+        <width>91</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	
+	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
+    border: 2px solid #8f8f91;
+    border-radius: 6px;
+    background-color: #353535;
+    min-width: 80px;
+	color: rgb(229, 229, 229);
+}
+
+QPushButton:hover {
+    border-color: #1a1a1a;
+}
+
+QPushButton:pressed {
+    background-color: #292929;
+}</string>
+      </property>
+      <property name="text">
+       <string>&lt;- Back</string>
+      </property>
+     </widget>
      <zorder>graphicsView_3</zorder>
      <zorder>widget_2</zorder>
+     <zorder>backPushButton</zorder>
     </widget>
     <widget class="QWidget" name="page_3">
      <widget class="QWidget" name="widget_3" native="true">
@@ -1254,38 +1287,6 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="confirmButton">
-       <property name="geometry">
-        <rect>
-         <x>460</x>
-         <y>540</y>
-         <width>171</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-	
-	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
-    border: 2px solid #8f8f91;
-    border-radius: 6px;
-    background-color: #353535;
-    min-width: 80px;
-	color: rgb(229, 229, 229);
-}
-
-QPushButton:hover {
-    border-color: #1a1a1a;
-}
-
-QPushButton:pressed {
-    background-color: #292929;
-}</string>
-       </property>
-       <property name="text">
-        <string>Confirm</string>
-       </property>
-      </widget>
      </widget>
      <widget class="QGraphicsView" name="graphicsView_4">
       <property name="geometry">
@@ -1314,162 +1315,12 @@ QPushButton:pressed {
        <string notr="true">background-color:  rgb(18,18,18);
 border-radius: 20px;  /* Adjust the radius as needed */</string>
       </property>
-      <widget class="QLabel" name="label_20">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>10</y>
-         <width>111</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QLabel{
-            color: #DDDDDD; /* Light grey text on dark background */
-            font-family: 'Inter ExtraBold', sans-serif;
-            font-size: 22pt; /* Adjust size as needed */
-}</string>
-       </property>
-       <property name="text">
-        <string>..or..</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="verticalLayoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>810</x>
-        <y>30</y>
-        <width>421</width>
-        <height>231</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QWidget" name="widget_5" native="true">
-         <property name="styleSheet">
-          <string notr="true">background-color:  rgb(27, 27, 27);
-border-radius: 20px;  /* Adjust the radius as needed */</string>
-         </property>
-         <widget class="QLabel" name="label_31">
-          <property name="geometry">
-           <rect>
-            <x>60</x>
-            <y>30</y>
-            <width>311</width>
-            <height>35</height>
-           </rect>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel{
-            color: #DDDDDD; /* Light grey text on dark background */
-            font-family: 'Inter ExtraBold', sans-serif;
-            font-size: 22pt; /* Adjust size as needed */
-}</string>
-          </property>
-          <property name="text">
-           <string>Import Contact Form:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-         <widget class="QToolButton" name="toolButton">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>100</y>
-            <width>81</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font: 20pt &quot;MS Shell Dlg 2&quot;;
-color: rgb(207, 207, 207);
-background-color: black;
-border-radius: 5px;</string>
-          </property>
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_32">
-          <property name="geometry">
-           <rect>
-            <x>170</x>
-            <y>150</y>
-            <width>81</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>-filename here-</string>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="addPushButton_3">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-	
-	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
-    border: 2px solid #8f8f91;
-    border-radius: 6px;
-    background-color: #353535;
-    min-width: 80px;
-	color: rgb(229, 229, 229);
-}
-
-QPushButton:hover {
-    border-color: #1a1a1a;
-}
-
-QPushButton:pressed {
-    background-color: #292929;
-}</string>
-         </property>
-         <property name="text">
-          <string>Preview Rental Agreement</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="addPushButton_4">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-	
-	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
-    border: 2px solid #8f8f91;
-    border-radius: 6px;
-    background-color: #353535;
-    min-width: 80px;
-	color: rgb(229, 229, 229);
-}
-
-QPushButton:hover {
-    border-color: #1a1a1a;
-}
-
-QPushButton:pressed {
-    background-color: #292929;
-}</string>
-         </property>
-         <property name="text">
-          <string>Update Excel Sheet</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
      <widget class="QWidget" name="widget_6" native="true">
       <property name="geometry">
        <rect>
         <x>680</x>
-        <y>280</y>
+        <y>30</y>
         <width>551</width>
         <height>351</height>
        </rect>
@@ -1504,11 +1355,40 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
       <widget class="QTableWidget" name="tableWidget">
        <property name="geometry">
         <rect>
-         <x>120</x>
-         <y>50</y>
-         <width>301</width>
+         <x>110</x>
+         <y>60</y>
+         <width>351</width>
          <height>221</height>
         </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QTableView {
+    font-family: 'Inter', sans-serif; /* Using Inter font */
+    font-size: 10pt; /* Adjust font size as needed */
+    color: #ffffff; /* Text color */
+    background-color: #333; /* Dark background color for the table */
+    selection-background-color: #555; /* Background color for selected items */
+    selection-color: #fff; /* Text color for selected items */
+    border: 1px solid #444; /* Border for the table */
+	border-radius: 5px;
+}
+
+QTableView QTableCornerButton::section {
+    background-color: #444; /* Background color for the top-left corner button */
+    border: 1px solid #555; /* Border for the top-left corner button */
+}
+QHeaderView::section {
+    background-color: #444; /* Dark background color for headers */
+    color: #ffffff; /* Text color for headers */
+    padding: 5px; /* Padding inside headers */
+    border: 1px solid #555; /* Border for headers */
+    border-radius: 5px; /* Rounded corners for headers */
+    font-family: 'Inter', sans-serif; /* Using Inter font for headers */
+}
+</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
        <attribute name="horizontalHeaderCascadingSectionResizes">
         <bool>false</bool>
@@ -1542,11 +1422,103 @@ border-radius: 20px;  /* Adjust the radius as needed */</string>
        </column>
       </widget>
      </widget>
+     <widget class="QWidget" name="verticalLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>850</x>
+        <y>410</y>
+        <width>201</width>
+        <height>196</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QCheckBox {
+	
+	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
+    border: 2px solid #8f8f91;
+    border-radius: 6px;
+    background-color: #353535;
+    min-width: 80px;
+	min-height: 40px;
+	color: rgb(229, 229, 229);
+}
+
+QCheckBox:hover {
+    border-color: #1a1a1a;
+}
+QCheckBox::indicator {
+	margin-left: 6px;
+    width: 15px; /* Width of the checkbox */
+    height: 15px; /* Height of the checkbox */
+    border: 1px solid #555; /* Border of the checkbox */
+    background-color: #333; /* Background color of the checkbox */
+}
+QCheckBox::indicator:checked {
+    background-color: #007bff; /* Background color for checked state */
+    border: 2px solid #0056b3; /* Border color for checked state */
+}
+
+QCheckBox::indicator:unchecked {
+    background-color: #333; /* Background color for unchecked state */
+    border: 2px solid #555; /* Border color for unchecked state */
+}
+
+QPushButton:pressed {
+    background-color: #292929;
+}</string>
+         </property>
+         <property name="text">
+          <string>Update Excel Sheet</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="confirmButton">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+	
+	font: 10pt &quot;Inter SemiBold&quot;, 'sans-serif';
+    border: 2px solid #8f8f91;
+    border-radius: 6px;
+    background-color: #353535;
+    min-width: 80px;
+	min-height: 40px;
+	color: rgb(229, 229, 229);
+}
+
+QPushButton:hover {
+    border-color: #1a1a1a;
+}
+
+QPushButton:pressed {
+    background-color: #292929;
+}</string>
+         </property>
+         <property name="text">
+          <string>Confirm</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <zorder>graphicsView_4</zorder>
      <zorder>widget_3</zorder>
      <zorder>widget_4</zorder>
      <zorder>verticalLayoutWidget_2</zorder>
      <zorder>widget_6</zorder>
+     <zorder>verticalLayoutWidget_2</zorder>
     </widget>
    </widget>
   </widget>

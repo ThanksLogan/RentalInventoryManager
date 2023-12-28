@@ -1,8 +1,11 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QListWidgetItem, QListWidget, QTableWidget, QTableWidgetItem, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QListWidgetItem, QListWidget, QTableWidget, QTableWidgetItem, QFileDialog
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtGui import QFontDatabase
 from PyQt5 import QtGui 
 from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QTimer
+
 
 from .fancyWindow import CustomTitleBar  # Importing CustomTitleBar
 
@@ -12,6 +15,7 @@ from business_logic import package_definitions
 from database.operations import create_booking, get_available_quantity
 from scripts import view_db
 import os
+import sys
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -24,12 +28,37 @@ class MainWindow(QMainWindow):
         self.title_bar = CustomTitleBar(self)
         self.setMenuWidget(self.title_bar) 
 
-
-
         ui_path = os.path.join(os.path.dirname(__file__), 'LujoIMS_UI_v1.2.ui')
         uic.loadUi(ui_path, self)
 
         '''Initializations'''
+        # Mapping from item name to ID
+        self.item_to_id = {
+            "Package: V2 Lounge 99": "V2_99",
+            "Package: V2 Lounge 100": "V2_100",
+            "Package: V2 Lounge 101": "V2_101",
+            "Package: V2 Lounge 98": "V2_98",
+            "Package: Legacy Lounge 99": "L_99",
+            "Package: Legacy Lounge 100": "L_100",
+            "Package: Legacy Lounge 101": "L_101",
+            "Package: Legacy Lounge Silver": "L_Silver",
+            "Package: Legacy Lounge Bronze": "L_Bronze",
+            "Package: Legacy Lounge Gold": "L_Gold",
+            "Legacy Backed Ottoman": "10125473",
+            "Legacy Big Ottoman": "92857097",
+            "Legacy Corner Chair": "63321077",
+            "Legacy Square": "90442326",
+            "Legacy Armless Chair": "42212173",
+            "Legacy Ottoman": "18612390",
+            "Legacy Rectangle": "16177294",
+            "V2 Ottoman": "12775351",
+            "V2 Corner Chair": "25942155",
+            "V2 Armless Chair": "29591065",
+            "V2 Square": "55453976"
+            # ... other mappings ...
+        }
+        # Create reverse mapping from ID to item name
+        self.id_to_item = {v: k for k, v in self.item_to_id.items()}
         # lists of packages with items and their quantities
         # order: armless, ottoman, squares, corners, TODO: LED cubes
         self.v2_98 = [(12775351, 2), (55453976, 4)]
@@ -37,9 +66,9 @@ class MainWindow(QMainWindow):
         self.v2_100 = [(29591065, 4), (12775351, 4), (55453976, 4), (25942155, 2)]
         self.v2_101 = [(29591065, 8), (12775351, 8), (55453976, 8), (25942155, 4)]
 
-        self.legacy_99 = [(42212173, 2), (18612390, 2), (55453976, 2), (25942155, 1)]
-        self.legacy_100 = [(42212173, 4), (18612390, 4), (55453976, 4), (25942155, 2)]
-        self.legacy_101 = [(42212173, 8), (18612390, 8), (55453976, 8), (25942155, 4)]
+        self.legacy_99 = [(42212173, 2), (18612390, 2), (55453976, 2), (63321077, 1)]
+        self.legacy_100 = [(42212173, 4), (18612390, 4), (55453976, 4), (63321077, 2)]
+        self.legacy_101 = [(42212173, 8), (18612390, 8), (55453976, 8), (63321077, 4)]
         self.legacy_bronze = [(10125473,1), (92857097,1), (16177294,4)]
         self.legacy_silver = [(10125473,2), (92857097,2), (16177294,4)]
         self.legacy_gold = [(10125473,4), (92857097,4), (16177294,8)]
@@ -69,13 +98,28 @@ class MainWindow(QMainWindow):
             "Package: Ultra Lounge 100": self.ultra_100,
             "Package: Ultra Lounge 101": self.ultra_101,   
         }
+        self.package_contents = {
+            "Package: V2 Lounge 98": {"V2 Ottoman": 2, "V2 Square": 4},
+            "Package: V2 Lounge 99": {"V2 Armless Chair": 2, "V2 Ottoman": 2, "V2 Square": 2, "V2 Corner Chair": 1},
+            "Package: V2 Lounge 100": {"V2 Armless Chair": 4, "V2 Ottoman": 4, "V2 Square": 4, "V2 Corner Chair": 2},
+            "Package: V2 Lounge 101": {"V2 Armless Chair": 8, "V2 Ottoman": 8, "V2 Square": 8, "V2 Corner Chair": 4},
+            "Package: Legacy Lounge 99": {"Legacy Armless Chair": 2, "Legacy Ottoman": 2, "Legacy Square": 2, "Legacy Corner Chair": 1},
+            "Package: Legacy Lounge 100": {"Legacy Armless Chair": 4, "Legacy Ottoman": 4, "Legacy Square": 4, "Legacy Corner Chair": 2},
+            "Package: Legacy Lounge 101": {"Legacy Armless Chair": 8, "Legacy Ottoman": 8, "Legacy Square": 8, "Legacy Corner Chair": 4},
+
+        }
+
+        # Connect itemClicked signal
+        self.currentlySelectedListWidget.itemClicked.connect(self.on_currentlySelectedItemClicked)
+        self.currentlySelectedListItem = None  # Variable to hold the currently selected item
 
         self.selected_item_name = None  # Initialize selected_item_name
         self.saved_items = None
 
+        
+
         self.init_ui()
         #self.currently_selected_item = None  # Attribute to store the selected item
-
 
     def init_ui(self):
         self.apply_stylesheet() 
@@ -96,6 +140,8 @@ class MainWindow(QMainWindow):
         # Initialize attributes for the selected dates
         self.from_date = None
         self.to_date = None
+        # Connect to the signal when the current page changes
+        self.stackedWidget.currentChanged.connect(self.onPageChanged)
 
         self.populate_list_widget()
 
@@ -105,17 +151,12 @@ class MainWindow(QMainWindow):
         self.ultraListWidget.itemClicked.connect(self.on_item_selected)
         # Repeat for other QListWidgets in other tabs
 
-        # Connect the Add button
+        #Connect the Buttons
+        self.backPushButton.clicked.connect(self.on_back_clicked)
         self.addPushButton.clicked.connect(self.on_add_item_clicked)
-
-        # Connect the Remove Button
         self.removePushButton.clicked.connect(self.on_remove_item_clicked)
-
-        # Connect the Done button 
         self.doneButton.clicked.connect(self.on_done_clicked)
-
         self.confirmButton.clicked.connect(self.on_confirm_button_clicked)
-
 
     def apply_stylesheet(self):
         # Load the Inter font family
@@ -232,7 +273,7 @@ class MainWindow(QMainWindow):
             background-color: #252525;
             color: #DDDDDD;
             font-family: 'Inter', sans-serif;
-            font-size: 10pt;
+            font-size: 9pt;
             border: 1px solid #6c6c6c;
             border-radius: 5px;
         }
@@ -250,7 +291,7 @@ class MainWindow(QMainWindow):
             background-color: #252525; /* Dark grey background */
             color: #DDDDDD; /* Light grey text for better contrast */
             font-family: 'Inter-Regular', sans-serif;
-            font-size: 10pt; /* Adjust the font size as needed */
+            font-size: 9pt; /* Adjust the font size as needed */
             border-radius: 5px; /* Rounded corners */
             border: 1px solid #6c6c6c; /* Border for the table */
         }
@@ -277,6 +318,23 @@ class MainWindow(QMainWindow):
 
         """
         self.setStyleSheet(css)
+
+    def get_item_id(self, item_name):
+        return self.item_to_id.get(item_name, 0)
+
+    def get_item_name(self, item_id):
+        return self.id_to_item.get(item_id, "Unknown")
+
+    def onPageChanged(self, index):
+        # Check if the current page is page 2
+        if index == 1:
+            self.existingBookingsListWidget.clear()
+        if index == 2:  # Assuming page 2 is at index 1
+            self.show_existing_bookings()
+
+    def on_back_clicked(self):
+        self.stackedWidget.setCurrentIndex(1)  # Assuming page 3 is at index 2
+
 
     def update_from_date_time(self):
         selected_date = self.fromDateCalendar.selectedDate()
@@ -305,6 +363,10 @@ class MainWindow(QMainWindow):
             # Handle the case where one or both dates are not selected
             print("Please select both 'from' and 'to' dates.")
 
+    def on_currentlySelectedItemClicked(self, item):
+        # Update the currently selected item
+        self.currentlySelectedListItem = item
+
     def populate_list_widget(self):
         # Assuming your QListWidget's name is furnitureListWidget
         for item_name in self.fetch_v2():
@@ -322,6 +384,27 @@ class MainWindow(QMainWindow):
         self.v2ListWidget.itemClicked.connect(self.on_item_clicked)
         self.legacyListWidget.itemClicked.connect(self.on_item_clicked)
         self.ultraListWidget.itemClicked.connect(self.on_item_clicked)
+
+    def show_existing_bookings(self):
+        cursor = self.conn.cursor()
+        from_date_string = self.from_date.toString("yyyy-MM-dd")
+        to_date_string = self.to_date.toString("yyyy-MM-dd")
+        # SQL query to find bookings between self.from_date and self.to_date
+        query = '''SELECT booking_id, item_id, quantity FROM bookings 
+                   WHERE (from_date <= ? AND to_date >= ?) 
+                      OR (from_date <= ? AND to_date >= ?)'''
+        cursor.execute(query, (from_date_string, from_date_string, to_date_string, to_date_string))
+
+        bookings = cursor.fetchall()
+
+        for booking in bookings:
+            booking_number, item_id, quantity = booking  # Assuming booking is a tuple like (booking_number, item_id, quantity)
+            item_name = self.get_item_name(str(item_id))
+
+            booking_info = '{}: {}  Q: {}'.format(booking_number, item_name, quantity)
+            self.existingBookingsListWidget.addItem(booking_info)
+
+        cursor.close()
 
     def fetch_v2(self):
         # Fetch furniture items from your database or data source
@@ -341,7 +424,6 @@ class MainWindow(QMainWindow):
         self.currently_selected_item = item
 
     def on_item_selected(self):
-
         # Get the selected item from the active QListWidget
         current_list_widget = self.get_active_list_widget()
         selected_item = current_list_widget.currentItem()
@@ -350,15 +432,57 @@ class MainWindow(QMainWindow):
         else:
             self.selected_item_name = None
         print(self.selected_item_name)
+
+
         ''' check if it's a package or an individual item '''
-        if(self.selected_item_name[0] == 'P'):
-            max_quantity = self.unpack_and_get_max_quantity(self.selected_item_name)
+        max_quantity = self.get_max_quantity(self.selected_item_name)
+
+        '''Check if the item is already present in the currentlySelectedListWidget''' 
+        for i in range(self.currentlySelectedListWidget.count()):
+            item_widget = self.currentlySelectedListWidget.item(i)
+            item_text = item_widget.text()
+            selected_item, selected_qty = self.parse_selected_item(item_text)
+            # Adjust max quantity for both packages and individual items
+            max_quantity = self.adjust_quantity_based_on_selection(selected_item, selected_qty, max_quantity)
+        ''' See if item is allowed to add or not by restricting spinbox and add button'''
+        self.spinBox.setMaximum(max(max_quantity, 0))
+        self.addPushButton.setEnabled(max_quantity>0)
+
+    def get_max_quantity(self, item_name):
+        ''' Calculate the max quantity available for the item_name '''
+        if item_name and item_name[0] == 'P':  # Check if it's a package
+            return self.unpack_and_get_max_quantity(item_name)
         else:
-            max_quantity = get_available_quantity(self.conn,
-                                                  self.get_item_id(self.selected_item_name), 
-                                                   self.from_date.toString("yyyy-MM-dd"), 
-                                                   self.to_date.toString("yyyy-MM-dd"))
-        self.spinBox.setMaximum(max_quantity)
+            return get_available_quantity(self.conn, self.get_item_id(item_name), 
+                                        self.from_date.toString("yyyy-MM-dd"), 
+                                        self.to_date.toString("yyyy-MM-dd"))
+
+    def parse_selected_item(self, item_text):
+        # Parse the item text to get the item name and quantity
+        parts = item_text.split(" - Quantity: ")
+        item_name = parts[0]
+        quantity = int(parts[1]) if len(parts) > 1 else 0
+        return item_name, quantity
+
+    def adjust_quantity_based_on_selection(self, selected_item, selected_qty, max_quantity):
+        # Adjust max_quantity based on selected_item and its quantity
+        if selected_item in self.package_contents:
+            # If the selected item is a package, adjust for each constituent item
+            for item, qty in self.package_contents[selected_item].items():
+                max_quantity = self.calculate_new_max(item, qty * selected_qty, max_quantity)
+        else:
+            # If the selected item is an individual item, adjust directly
+            max_quantity = self.calculate_new_max(selected_item, selected_qty, max_quantity)
+        return max_quantity
+
+    def calculate_new_max(self, item, qty, max_quantity):
+        # Calculate new max_quantity based on item and qty
+        for i in range(self.currentlySelectedListWidget.count()):
+            widget_text = self.currentlySelectedListWidget.item(i).text()
+            widget_item, widget_qty = self.parse_selected_item(widget_text)
+            if widget_item == item or (widget_item in self.package_contents and item in self.package_contents[widget_item]):
+                max_quantity -= widget_qty
+        return max_quantity
         
     def unpack_and_get_max_quantity(self, item_name):
         ''' 
@@ -372,14 +496,20 @@ class MainWindow(QMainWindow):
             return 0  # Or handle the error as needed
 
         item_and_inStock = self.loop_and_unpack(package_configuration)
-        item_list = item_and_inStock[0]
-        weakLink = item_list[0] // package_configuration[0][1]
+        if(item_and_inStock[1] == False):
+            return 0
+        else:
+            item_list = item_and_inStock[0] # in format [q,q,q,q]
+            #initialization for loop
+            weakLink = item_list[0] // package_configuration[0][1]
+            for i, item_amount in enumerate(item_list):
+                quantity = item_amount // package_configuration[i][1]
+                weakLink = min(weakLink, quantity)
+            print(weakLink, item_and_inStock[1])
 
-        for i, item_amount in enumerate(item_list):
-            quantity = item_amount // package_configuration[i][1]
-            weakLink = min(weakLink, quantity)
-
-        return weakLink
+            return weakLink
+        
+        
         
         
     def loop_and_unpack(self, pkg):
@@ -409,29 +539,32 @@ class MainWindow(QMainWindow):
   '''
     
     def on_add_item_clicked(self):
-        # Check if an item has been selected
-        if self.selected_item_name is not None:
+        # Check if an item has been selected and the quantity is more than 0
+        if self.selected_item_name is not None and self.spinBox.value() > 0:
             quantity = self.spinBox.value()
             item_with_quantity = f"{self.selected_item_name} - Quantity: {quantity}"
 
-            # Add the selected item's text to the secondListWidget
+            # Add the selected item's text to the currentlySelectedListWidget
             self.currentlySelectedListWidget.addItem(item_with_quantity)
 
             # Optionally, clear the currently selected item
             self.selected_item_name = None
         else:
-            print("No item selected")  # Or show a message to the user
+            if self.selected_item_name is None:
+                print("No item selected")  # Or show a message to the user
+            else:
+                print("Quantity cannot be zero")  # Or show a message to the user
 
     def on_remove_item_clicked(self):
-        # Check if an item is selected
-        if self.selected_item_name:
-            # Find the row of the selected item
-            row = self.currentlySelectedListWidget.row(self.selected_item_name)
-            # Remove the item from the list
+        if self.currentlySelectedListItem:
+            # Remove the selected item from the list
+            row = self.currentlySelectedListWidget.row(self.currentlySelectedListItem)
             self.currentlySelectedListWidget.takeItem(row)
+
+            # Reset the currently selected item
+            self.currentlySelectedListItem = None
         else:
             print("No item selected to remove")  # Or show a message to the user
-
 
     def get_active_list_widget(self):
         # Assuming you have a QTabWidget named tabWidget
@@ -553,7 +686,39 @@ class MainWindow(QMainWindow):
     def calculate_price(self, item_name, quantity):
         # Placeholder function to calculate price, modify as needed
         # Example: return a fixed price per item
-        return 10 * quantity  # Example: $10 per item
+        price = self.get_price(item_name, quantity)
+        return price  # Example: $10 per item
+    def get_price(self, item_name, quantity):
+        #query from sql
+        price = 0
+        if (item_name[0] == 'P'):
+            match item_name: # TODO: id for LED: 56556348
+                case "Package: V2 Lounge 99":
+                    price = 360.00
+                case "Package: V2 Lounge 100":
+                    price = 695.00
+                case "Package: V2 Lounge 101":
+                    price = 1095.00
+                case "Package: V2 Lounge 98":
+                    price = 270.00
+                case "Package: Legacy Lounge 99":
+                    price = 360.00
+                case "Package: Legacy Lounge 100":
+                    price = 695.00
+                case "Package: Legacy Lounge 101":
+                    price = 1095.00
+        else:
+            id = self.get_item_id(item_name)
+            cursor = self.conn.cursor()
+            # SQL query to get the price
+            query = "SELECT price FROM furniture_items WHERE item_id = ?"
+            cursor.execute(query, (id,))
+
+            result = cursor.fetchone()
+            price = result[0]
+        return price * quantity
+
+
 
     def on_confirm_button_clicked(self):
         # Collect data from LineEdits
@@ -566,8 +731,8 @@ class MainWindow(QMainWindow):
             self.lineEdit_6.text(),
             self.lineEdit_7.text(),
             self.lineEdit_8.text(),
-            self.lineEdit_9.text()]
-
+            self.lineEdit_9.text()
+            ]
         # Collect data from QTableWidget
         table_data = []
         for row in range(self.tableWidget.rowCount()):
@@ -577,11 +742,78 @@ class MainWindow(QMainWindow):
                 row_data.append(item.text() if item else "")
             table_data.append(row_data)
 
-        # Format the data into a string
-        agreement_text = self.format_agreement_text(line_edit_data, table_data)
+        #Attempt at generating HTML 
+        html_content = self.generate_html_content(line_edit_data, self.tableWidget)
 
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save Agreement", "", "HTML Files (*.html)")
+        if file_name:
+            with open(file_name, 'w') as file:
+                file.write(html_content)
+
+        # Format the data into a string
+        #agreement_text = self.format_agreement_text(line_edit_data, table_data)
         # Save the file
-        self.save_agreement_to_file(agreement_text)
+        #self.save_agreement_to_file(agreement_text)
+
+    def generate_html_content(self, line_edit_data, table_widget):
+        with open('gui/css/modern_style.css', 'r') as css_file:
+            css_content = css_file.read()    
+        
+        html_template = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+            {css_content}
+            </style>
+            <title>Rental Agreement</title>
+        </head>
+        <body>
+            <div class="agreement-container">
+                <h1>Rental Agreement</h1>
+                    <p>By signing this agreement, the Customer (hereinafter referred to as "the Renter") agrees to the following terms and conditions:</p>
+                    <ol>
+                        <li>The Renter agrees to take proper care of the rented items and ensure they are used in a manner consistent with their intended purpose.</li>
+                        <li>The Renter acknowledges that the items are in good condition at the time of rental and agrees to return them in the same condition, barring normal wear and tear.</li>
+                        <li>The Renter agrees to be fully responsible for the loss or any damage to the rented items during the rental period.</li>
+                        <li>In case of damage or loss, the Renter agrees to compensate the rental company at the current replacement value of the items.</li>
+                        <li>The Renter shall not sublease or transfer the rented items to any other party without the prior written consent of the rental company.</li>
+                        <li>The Renter agrees to use the items safely and adhere to all laws and regulations related to the use of such items.</li>
+                        <li>The rental company is not responsible for any accidents or injuries caused by the use or misuse of the rented items.</li>
+                        <li>The Renter agrees to return the items on or before the agreed-upon return date. Late returns may be subject to additional fees.</li>
+                    </ol>
+
+                <h2>Customer Information</h2>
+                <p>Name: {line_edit_data[0]}</p>
+                <p>Email: {line_edit_data[1]}</p>
+                <p>Phone Number: {line_edit_data[2]}</p>
+                <p>Day of Event Phone: {line_edit_data[3]}</p>
+                <p>Full Contact Address: {line_edit_data[4]}</p>
+                <p>Name of Event: {line_edit_data[5]}</p>
+                <p>Event Location: {line_edit_data[6]}</p>
+                <p>Date of Event: {line_edit_data[7]}</p>
+                <p>Start & End Time: {line_edit_data[8]}</p>
+
+                <h2>Order Details</h2>
+                <ul>
+        """
+        for row in range(table_widget.rowCount()):
+            item_name = table_widget.item(row, 0).text() if table_widget.item(row, 0) else ''
+            quantity = table_widget.item(row, 1).text() if table_widget.item(row, 1) else ''
+            price = table_widget.item(row, 2).text() if table_widget.item(row, 2) else ''
+            html_template += f"<li>{item_name} - Quantity: {quantity} - Price: {price}</li>"
+        
+        html_template += """
+                </ul>
+                <h2>Signature</h2>
+                <p>Customer Signature:</p>
+                <div class="signature-area"></div>
+            </div>
+        </body>
+        </html>
+        """
+        return html_template
+
 
     def format_agreement_text(self, line_edit_data, table_data):
         # Format the data into a string that will be written to the file
@@ -596,16 +828,6 @@ class MainWindow(QMainWindow):
             agreement_text += ", ".join(row) + "\n"
 
         return agreement_text
-
-    def save_agreement_to_file(self, agreement_text):
-        # Open a file dialog for the user to choose where to save the file
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save Agreement", "", "Text Files (*.txt)", options=options)
-        
-        if file_name:
-            with open(file_name, 'w') as file:
-                file.write(agreement_text)
-
 
     def get_database_connection(self):
         # Implement the logic to create and return a database connection

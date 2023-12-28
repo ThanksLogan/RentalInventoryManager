@@ -46,7 +46,7 @@ Username: ```admin```
 
 Password: ```password```
 
-<img src="https://github.com/ThanksLogan/RentalInventoryManager/assets/89110766/f327690f-7eb7-4842-a1b4-54f425011ea4" width="690" height="396">
+![image](https://github.com/ThanksLogan/RentalInventoryManager/assets/89110766/f327690f-7eb7-4842-a1b4-54f425011ea4)
 
 ****
 
